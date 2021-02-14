@@ -9,6 +9,11 @@ config :price_tracker, PriceTracker.Repo,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
+config :price_tracker, PriceTracker.Influx,
+  database: "price_tracker_dev",
+  host: "localhost",
+  port: 8086
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #

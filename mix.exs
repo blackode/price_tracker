@@ -49,7 +49,8 @@ defmodule PriceTracker.MixProject do
       {:httpoison, "~> 1.7.0"},
       {:word_smith, "~> 0.2.0"},
       {:money, "~> 1.8.0"},
-      {:uuid, "~> 1.1"}
+      {:uuid, "~> 1.1"},
+      {:instream, "~> 1.0"}
     ]
   end
 

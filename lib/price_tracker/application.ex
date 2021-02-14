@@ -9,6 +9,8 @@ defmodule PriceTracker.Application do
     children = [
       # Start the Ecto repository
       PriceTracker.Repo,
+      # Start the Timeseries Influx repository
+      PriceTracker.Influx,
       # Start the Telemetry supervisor
       PriceTrackerWeb.Telemetry,
       # Start the PubSub system

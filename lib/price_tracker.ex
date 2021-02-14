@@ -1,6 +1,6 @@
 defmodule PriceTracker do
   require Logger
-  alias PriceTracker.Models.Items
+  alias PriceTracker.Models.{Items, ItemPrice}
 
   @moduledoc """
   PriceTracker keeps the contexts that define your domain
@@ -32,7 +32,10 @@ defmodule PriceTracker do
               |> Map.put(:link, price_link)
               |> Map.merge(%{status: true})
 
-            save_item_details(price_data)
+            Task.start(fn ->
+              save_item_details(price_data)
+            end)
+
             {:ok, price_data}
 
           {:error, error} ->
@@ -48,15 +51,29 @@ defmodule PriceTracker do
   def save_item_details(price_data) do
     uuid = UUID.uuid3(:dns, price_data.name)
 
-    price_data = %{
+    item_data = %{
       name: price_data.name,
       uuid: uuid,
       url: price_data.link
     }
 
-    case Items.insert(price_data) do
-      {:ok, item} -> Logger.error("item inserted #{item.name}")
-      error -> Logger.error(inspect(error))
+    item_price_data = %{
+      uuid: uuid,
+      price: price_data.price
+    }
+
+    IO.inspect(item_price_data)
+
+    case Items.insert(item_data) do
+      {:ok, item} ->
+        ItemPrice.insert(item_price_data)
+        Logger.error("item inserted #{item.name}")
+
+      {:error, changeset} ->
+        if Utils.has_value(changeset.errors[:name]),
+          do: ItemPrice.insert(item_price_data)
+
+        Logger.error(inspect(changeset))
     end
   end
 end
