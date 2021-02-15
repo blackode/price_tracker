@@ -32,9 +32,14 @@ defmodule PriceTracker do
               |> Map.put(:link, price_link)
               |> Map.merge(%{status: true})
 
-            Task.start(fn ->
-              save_item_details(price_data)
-            end)
+            price_data =
+              case save_item_details(price_data) do
+                {:ok, data} ->
+                  Map.merge(data, price_data)
+
+                {:error, data} ->
+                  Map.merge(data, price_data)
+              end
 
             {:ok, price_data}
 
@@ -62,18 +67,19 @@ defmodule PriceTracker do
       price: price_data.price
     }
 
-    IO.inspect(item_price_data)
+    case Items.find(uuid) do
+      nil ->
+        case Items.insert(item_data) do
+          {:ok, item} ->
+            ItemPrice.insert(item_price_data)
+            ItemPrice.get_item_price_by_uuid(item.uuid)
 
-    case Items.insert(item_data) do
-      {:ok, item} ->
-        ItemPrice.insert(item_price_data)
-        Logger.error("item inserted #{item.name}")
+          {:error, changeset} ->
+            {:ok, changeset}
+        end
 
-      {:error, changeset} ->
-        if Utils.has_value(changeset.errors[:name]),
-          do: ItemPrice.insert(item_price_data)
-
-        Logger.error(inspect(changeset))
+      item ->
+        ItemPrice.get_item_price_by_uuid(item.uuid)
     end
   end
 end

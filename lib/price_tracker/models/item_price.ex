@@ -35,7 +35,6 @@ defmodule PriceTracker.Models.ItemPrice do
       fields: %__MODULE__.Fields{price: attrs[:price]},
       tags: %__MODULE__.Tags{item_uuid: attrs[:uuid]}
     })
-    |> IO.inspect()
   end
 
   @doc """

@@ -71,4 +71,8 @@ defmodule PriceTracker.Models.Items do
     |> changeset(attrs)
     |> Repo.insert()
   end
+
+  def find(uuid) do
+    Repo.get_by(__MODULE__, uuid: uuid)
+  end
 end
